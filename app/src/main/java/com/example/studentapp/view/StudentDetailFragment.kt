@@ -1,6 +1,7 @@
 package com.example.studentapp.view
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,11 @@ import com.example.studentapp.R
 import com.example.studentapp.databinding.FragmentStudentDetailBinding
 import com.example.studentapp.viewmodel.DetailViewModel
 import com.squareup.picasso.Picasso
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
+
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -38,22 +44,23 @@ class StudentDetailFragment : Fragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        if(arguments != null) {
+            val sid = StudentDetailFragmentArgs.fromBundle(requireArguments()).id
         super.onViewCreated(view, savedInstanceState)
+            Log.d("detail-fragment",sid.toString())
+            viewModel = ViewModelProvider(this).get(DetailViewModel::class.java)
+            viewModel.fetch(sid)
+            viewModel.studentLD.observe(viewLifecycleOwner, Observer{
 
-        viewModel = ViewModelProvider(this).get(DetailViewModel::class.java)
-        viewModel.fetch()
-
-        viewModel.studentLD.observe(viewLifecycleOwner, Observer {
-            Picasso.get().load(it.photourl).into(binding.imageView2)
-            binding.txtId.setText(it.id)
-            binding.txtName.setText(it.name)
-            binding.txtBOD.setText(it.dob)
-            binding.txtPhone.setText(it.phone)
-        })
+                binding.student = it
 
 
+            })
+        }
 
 
     }
+
+
 }
 
